@@ -1,0 +1,44 @@
+# The strategy the unit tests run on: invented test inputs, not anyone's strategy or a recommendation.
+start_amount: 100000
+monthly: 20000
+target_monthly: 15000
+higher_monthly: 30000
+group_yield_pct: 5
+goat_growth_pct: 5
+grower_growth_pct: 8
+stable_grower_years: 12
+stable_payer_years: 15
+low_yield_pct: 1.5
+large_cap_only_groups: [Grower, Stable Grower, Stable Payer]
+high_yield_flag_pct: 5
+high_yield_min_price_cagr_pct: -2
+min_yield_plus_growth_pct: 7
+max_payout_pct: 75
+max_reit_payout_pct: 85
+max_debt_to_fcf: 4
+min_cover: 1.2
+etf_min_pct: 25
+etf_max_pct: 55
+weight_cap_pct: 12
+income_cap_pct: 18
+etf_income_cap_pct: 35
+moonshot_income_cap_pct: 8
+currency_income_cap_pct: {GBP: 25}
+fee_max_pct: 0.6
+yoc_year10_pct: 8
+price_growth_pct: 4
+price_growth_tolerance_pct: 0.5
+projection_growth_cap_pct: 9
+projection_growth_haircut: 0.75
+stock_reinvest_currencies: [XTS]
+switch_years: [8, 12, 16]
+switch_sell_pct: 55
+switch_stock_share_pct: 45
+bond_cap_pct: 20
+double_down_etf_drop_pct: 12
+double_down_stock_drop_pct: 25
+double_down_multiple: 2
+income_currencies: [USD, EUR, GBP]
+excluded_tickers: {XEXA: test exclusion, XEXB: test exclusion}
+excluded_fund_words: [bond, fixed income, money market]
+liked_tickers: [AAPL]

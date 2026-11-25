@@ -1,0 +1,21 @@
+# Build output
+/pb
+/portfolio-builder
+/dist/
+
+# Your data: the profile, packs, runs, memory and anything a connector saves. It is yours and
+# is never committed to this repository (keep it in a git repository of its own if you like).
+/data/
+.env
+.env.*
+!.env.example
+*.har
+
+# Local noise
+.DS_Store
+*.swp
+__pycache__/
+/.tools/
+.claude/settings.local.json
+.claude/worktrees/
+/.tmp-*

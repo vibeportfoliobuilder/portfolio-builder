@@ -1,0 +1,6 @@
+as_of: "2031-03-07"
+source: test fixture (hand-written)
+rows:
+- {ticker: FINC, name: Example Nasdaq Premium Income UCITS, isin: IE0000000104, exchange: LSE, mic: XLON, currency: USD, class: Dist, asset_type: Equity ETFs}
+- {ticker: FBND, name: Example Global Aggregate Bond, isin: IE0000000115, exchange: LSE, mic: XLON, currency: USD, class: Dist, asset_type: Bond ETFs}
+- {ticker: FWLD, name: Example All-World, isin: IE0000000116, exchange: LSE, mic: XLON, currency: USD, class: Dist, asset_type: Equity ETFs}

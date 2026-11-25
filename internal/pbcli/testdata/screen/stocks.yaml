@@ -1,0 +1,8 @@
+as_of: "2031-03-07"
+source: test fixture (hand-written)
+rows:
+- {ticker: AAA, name: Alpha Yield, isin: US0000000001, mic: XNYS, currency: USD, country: United States, sector: Utilities, market_cap_usd_m: 50000, yield_pct: 7, payout_pct: 60, div_growth_3y_pct: 8, instrument_id: i-aaa}
+- {ticker: BBB, name: Beta Grower, isin: US0000000002, mic: XNAS, currency: USD, country: United States, sector: Technology, market_cap_usd_m: 300000, yield_pct: 2.5, payout_pct: 30, div_growth_3y_pct: 15, instrument_id: i-bbb}
+- {ticker: CCC, name: Gamma Payout, isin: GB0000000003, mic: XLON, currency: GBP, country: United Kingdom, sector: Finance, market_cap_usd_m: 20000, yield_pct: 9, payout_pct: 95, div_growth_3y_pct: 1}
+- {ticker: XEXA, name: Excluded Co, isin: US0000000004, mic: XNYS, currency: USD, country: United States, sector: Consumer Defensive, market_cap_usd_m: 200000, yield_pct: 5}
+- {ticker: DDD, name: Delta Swiss, isin: CH0000000005, mic: XSWX, currency: CHF, country: Switzerland, sector: Health, market_cap_usd_m: 90000, yield_pct: 4}

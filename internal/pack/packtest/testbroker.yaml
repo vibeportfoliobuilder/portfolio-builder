@@ -1,0 +1,51 @@
+# Test Broker: the broker pack the unit tests run on. Every fee is invented for the tests.
+key: testbroker
+name: Test Broker
+fx_cost_pct: 0.4
+withholding_overrides:
+  CA: 22
+levy_no_exemption: true
+credits_line_currency: true
+default_etf_market: etf-xetra
+default_market: us
+market_by_country:
+  US: us
+  CA: tsx
+  GB: lse
+  DE: xetra
+  FR: paris
+  NL: amsterdam
+  BE: brussels
+  IT: milan
+  ES: madrid
+  PT: lisbon
+  AT: vienna
+  IE: dublin
+  FI: helsinki
+  SE: stockholm
+  NO: oslo
+  DK: copenhagen
+  ZZ: home
+  CH: six
+markets:
+  us:         {name: US, currency: USD, kind: share, pct_fee: 0.12, min: 0.15, max: 1.2}
+  tsx:        {name: Toronto, currency: CAD, kind: share, fixed: 2}
+  lse:        {name: London, currency: GBP, kind: share, fixed: 1, tax_pct: 0.5, tax_label: "stamp duty 0.5%"}
+  xetra:      {name: Xetra, currency: EUR, kind: share, fixed: 1}
+  six:        {name: SIX, currency: CHF, kind: share, pct_fee: 0.12, min: 2}
+  paris:      {name: Paris, currency: EUR, kind: share, fixed: 1, tax_pct: 0.4, tax_label: "financial transaction tax 0.4%"}
+  amsterdam:  {name: Amsterdam, currency: EUR, kind: share, fixed: 1}
+  brussels:   {name: Brussels, currency: EUR, kind: share, fixed: 1}
+  milan:      {name: Milan, currency: EUR, kind: share, fixed: 1.5}
+  madrid:     {name: Madrid, currency: EUR, kind: share, fixed: 1, tax_pct: 0.2, tax_label: "financial transaction tax 0.2%"}
+  lisbon:     {name: Lisbon, currency: EUR, kind: share, fixed: 1}
+  vienna:     {name: Vienna, currency: EUR, kind: share, fixed: 1}
+  dublin:     {name: Dublin, currency: EUR, kind: share, fixed: 1, tax_pct: 1, tax_label: "stamp duty 1%"}
+  helsinki:   {name: Helsinki, currency: EUR, kind: share, fixed: 1}
+  stockholm:  {name: Stockholm, currency: SEK, kind: share, pct_fee: 0.1, min: 10}
+  oslo:       {name: Oslo, currency: NOK, kind: share, offered: false}
+  copenhagen: {name: Copenhagen, currency: DKK, kind: share, pct_fee: 0.1, min: 10}
+  home:       {name: Testland exchange, currency: XTS, kind: share, pct_fee: 0.15, min: 3}
+  etf-xetra:  {name: Funds Xetra, currency: EUR, kind: etf, fixed: 0}
+  etf-lse-usd: {name: Funds London USD, currency: USD, kind: etf, fixed: 0}
+  etf-lse-eur: {name: Funds London EUR, currency: EUR, kind: etf, fixed: 0}

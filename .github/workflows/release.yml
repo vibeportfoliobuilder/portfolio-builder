@@ -1,0 +1,20 @@
+# Builds the downloadable kits on a version tag (git tag v0.1.0 && git push origin v0.1.0).
+name: release
+on:
+  push:
+    tags: ["v*"]
+permissions:
+  contents: write
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+      - run: make test
+      - run: scripts/release.sh "${GITHUB_REF_NAME}"
+      - run: gh release create "${GITHUB_REF_NAME}" dist/*.zip dist/checksums.txt --title "${GITHUB_REF_NAME}" --generate-notes
+        env:
+          GH_TOKEN: ${{ github.token }}

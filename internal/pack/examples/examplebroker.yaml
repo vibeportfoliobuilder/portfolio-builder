@@ -1,0 +1,48 @@
+# Example Broker: a MADE-UP broker pack for the examples and the tests. The /broker-connector
+# skill writes your broker's real pack to data/packs/broker/<name>.yaml at setup.
+key: examplebroker
+name: Example Broker
+fx_cost_pct: 0.25
+withholding_overrides: {}
+reit_withholding: {}
+default_etf_market: etf-xetra
+default_market: us
+market_by_country:
+  US: us
+  CA: tsx
+  GB: lse
+  DE: xetra
+  FR: paris
+  NL: amsterdam
+  BE: brussels
+  IT: milan
+  ES: madrid
+  PT: lisbon
+  AT: vienna
+  IE: dublin
+  FI: helsinki
+  SE: stockholm
+  NO: oslo
+  DK: copenhagen
+  CH: six
+markets:
+  us:         {name: "United States · NYSE, Nasdaq", currency: USD, kind: share, fixed: 1}
+  tsx:        {name: "Canada · Toronto", currency: CAD, kind: share, fixed: 1}
+  lse:        {name: "United Kingdom · London", currency: GBP, kind: share, fixed: 1, tax_pct: 0.5, tax_label: "stamp duty 0.5%"}
+  xetra:      {name: "Germany · Xetra", currency: EUR, kind: share, fixed: 1}
+  paris:      {name: "France · Paris", currency: EUR, kind: share, fixed: 1, tax_pct: 0.4, tax_label: "financial transaction tax 0.4%"}
+  amsterdam:  {name: "Netherlands · Amsterdam", currency: EUR, kind: share, fixed: 1}
+  brussels:   {name: "Belgium · Brussels", currency: EUR, kind: share, fixed: 1}
+  milan:      {name: "Italy · Milan", currency: EUR, kind: share, fixed: 1}
+  madrid:     {name: "Spain · Madrid", currency: EUR, kind: share, fixed: 1}
+  lisbon:     {name: "Portugal · Lisbon", currency: EUR, kind: share, fixed: 1}
+  vienna:     {name: "Austria · Vienna", currency: EUR, kind: share, fixed: 1}
+  dublin:     {name: "Ireland · Dublin", currency: EUR, kind: share, fixed: 1}
+  helsinki:   {name: "Finland · Helsinki", currency: EUR, kind: share, fixed: 1}
+  stockholm:  {name: "Sweden · Stockholm", currency: SEK, kind: share, fixed: 10}
+  oslo:       {name: "Norway · Oslo", currency: NOK, kind: share, fixed: 10}
+  copenhagen: {name: "Denmark · Copenhagen", currency: DKK, kind: share, fixed: 7}
+  six:        {name: "Switzerland · SIX", currency: CHF, kind: share, fixed: 1}
+  etf-xetra:  {name: "Funds · Xetra", currency: EUR, kind: etf, fixed: 0}
+sources:
+  - invented for the examples, 2026-11-25

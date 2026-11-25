@@ -1,0 +1,51 @@
+# Testland: the country pack the unit tests run on. XTS is ISO 4217's code reserved for testing.
+# Every figure is invented for the tests: not any country's tax rates.
+code: ZZ
+name: Testland
+currency: XTS
+inflation_pct: 3.2
+inflation_note: Testland's invented long-run inflation
+withholding:
+  ZZ: 0
+  GB: 0
+  US: 25
+  CA: 20
+  NL: 15
+  DE: 20
+  FR: 12
+  CH: 30
+  IE: 20
+  ES: 18
+  IT: 22
+  BE: 25
+  AT: 24
+  PT: 24
+  SE: 25
+  NO: 22
+  DK: 24
+  FI: 28
+  TW: 21
+  BM: 0
+  KY: 0
+  JE: 0
+  HK: 0
+  SG: 0
+reit_withholding:
+  GB: 18
+fund_withholding:
+  IE: 0
+  LU: 0
+unrated: [AU, PA, RU, EU]
+transaction_tax:
+  label: transaction levy 0.3%
+  market: home
+  rate_pct: 0.3
+  cap: 15000
+  exempt_up_to: 40000
+bonds:
+  name: Testland government bonds
+  currency: XTS
+  yields_pct: [3.5, 4.25]
+  tax_free: true
+account: Testland tax-free account
+macro_areas: [ZZ, US, GB, EU]
