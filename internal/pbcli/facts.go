@@ -76,6 +76,8 @@ else financial_data.yaml ttm.statements); and the committee's gate figures compu
   gate1_tests             how many of the three hold
   gate2_rule_of_40        latest revenue growth % (year on year) + latest FCF margin %; parts shown,
                           with the 3y CAGR as the growth in parts.with_cagr_3y
+Where the latest fiscal year has no FCF (a vendor gap, common just after a year end), the FCF tests
+use the TTM's FCF and say so (parts.fcf_basis, note).
 Every figure names its field (source), e.g. financial_data.yaml years[fiscal_year=2025].statements.revenue,
 which pb get reads as written. Amounts are in the file's units (millions). A missing figure is null
 (DATA UNAVAILABLE). Funds print "no statements (fund)". Read-only; the verdicts are the agents'.
@@ -179,7 +181,7 @@ func (e *env) facts(ticker, kind string, n int) factsDoc {
 	}
 	d.Years = all[max(0, len(all)-n):]
 	d.TTM = e.factsTTM(t, v)
-	d.Gates = gates(all)
+	d.Gates = gates(all, d.TTM)
 	d.Columns = map[string]string{
 		"statement lines": "the row's source + the key (revenue, op_income, fcf, diluted_shares, cash_and_st_inv, total_debt)",
 		"op_margin_pct":   "computed: op_income / revenue × 100",
@@ -188,7 +190,7 @@ func (e *env) facts(ticker, kind string, n int) factsDoc {
 	}
 	if d.TTM != nil && d.TTM.FCF != nil {
 		for _, k := range []string{"gate1_profitable", "gate2_rule_of_40"} {
-			if g := d.Gates[k]; g.Note != "" {
+			if g := d.Gates[k]; g.Passed == nil && g.Note != "" {
 				g.Note += fmt.Sprintf("; the TTM has fcf %s (%s)", fnum(d.TTM.FCF), d.TTM.Source)
 				d.Gates[k] = g
 			}
@@ -238,7 +240,9 @@ func statementYear(st map[string]any) factYear {
 }
 
 // gates computes the gate 1 and gate 2 figures from every year with statements (oldest first).
-func gates(all []factYear) map[string]factGate {
+// Where the latest fiscal year carries no FCF (a vendor gap, common right after a year end), the
+// FCF tests use the TTM instead, and say so in the gate's note and its fcf_basis part.
+func gates(all []factYear, ttm *factYear) map[string]factGate {
 	last := all[len(all)-1]
 	byFY := map[int]factYear{}
 	for _, y := range all {
@@ -277,6 +281,11 @@ func gates(all []factYear) map[string]factGate {
 	if last.FCF != nil && last.OpMarginPct != nil {
 		g.Parts = map[string]any{"fy": last.FY, "fcf": *last.FCF, "op_margin_pct": *last.OpMarginPct}
 		g.Passed = boolp(*last.FCF > 0 && *last.OpMarginPct > 0)
+	} else if last.FCF == nil && last.OpMarginPct != nil && ttm != nil && ttm.FCF != nil {
+		g.Parts = map[string]any{"fy": last.FY, "fcf": *ttm.FCF, "fcf_basis": "TTM " + ttm.PeriodEnd, "op_margin_pct": *last.OpMarginPct}
+		g.Passed = boolp(*ttm.FCF > 0 && *last.OpMarginPct > 0)
+		g.Source = fmt.Sprintf("%s fcf (TTM %s) and financial_data.yaml years[fiscal_year=%d].statements op_income / revenue", ttm.Source, ttm.PeriodEnd, last.FY)
+		g.Note = fmt.Sprintf("FY%d has no fcf: the TTM's is used", last.FY)
 	} else {
 		g.Note = fmt.Sprintf("%s: FCF or operating margin missing for FY%d", unavailable, last.FY)
 	}
@@ -312,6 +321,15 @@ func gates(all []factYear) map[string]factGate {
 			g.Parts["with_cagr_3y"] = map[string]any{"revenue_cagr_3y_pct": *cagr, "score": *round2(*cagr + *last.FCFMarginPc)}
 		}
 		g.Passed = boolp(*g.Value >= 40)
+	} else if growth != nil && last.FCF == nil && ttm != nil && ttm.FCFMarginPc != nil {
+		g.Value = round2(*growth + *ttm.FCFMarginPc)
+		g.Parts = map[string]any{"revenue_growth_pct": *growth, "fcf_margin_pct": *ttm.FCFMarginPc, "fcf_basis": "TTM " + ttm.PeriodEnd}
+		if cagr != nil {
+			g.Parts["with_cagr_3y"] = map[string]any{"revenue_cagr_3y_pct": *cagr, "score": *round2(*cagr + *ttm.FCFMarginPc)}
+		}
+		g.Passed = boolp(*g.Value >= 40)
+		g.Source = fmt.Sprintf("computed: (revenue FY%d / revenue FY%d − 1) × 100 from %s and %s, + fcf / revenue × 100 from %s (TTM %s)", last.FY, last.FY-1, rev(last.FY-1), rev(last.FY), ttm.Source, ttm.PeriodEnd)
+		g.Note = fmt.Sprintf("FY%d has no fcf: the FCF margin is the TTM's", last.FY)
 	} else {
 		g.Note = fmt.Sprintf("%s: needs revenue for FY%d and FY%d and FCF for FY%d", unavailable, last.FY-1, last.FY, last.FY)
 	}

@@ -280,7 +280,7 @@ const VendorGapsFile = "vendor_gaps.yaml"
 // The vendor-wide gaps.
 var (
 	gapAltmanZ = VendorGap{"no Altman Z", "eulerpool: the vendor's Altman Z is always 9999, so none is carried"}
-	gapBalance = VendorGap{"annual balance lines from the quarter-end",
+	gapBalance = VendorGap{"annual balance sheet mis-mapped (lines from the quarter-end)",
 		"eulerpool: annual balance-sheet totals are mis-mapped by the vendor (assets = goodwill), so balance lines come from the matching quarter-end; earlier years carry cash and debt only"}
 	gapSpecial = VendorGap{"no special-dividend flag",
 		"eulerpool: the dividend ledger has no special-dividend flag and is split-adjusted; a one-off payment counts as regular in the totals, streaks and CAGRs"}
