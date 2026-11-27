@@ -1,0 +1,9 @@
+# Made-up company: falling revenue, no FCF in the latest year, more debt than cash.
+ticker: PLAIN
+currency: XTS
+units: Monetary amounts in millions of XTS.
+years:
+- fiscal_year: 2028
+  statements: {revenue: 500, op_income: 50, fcf: 20, cash_and_st_inv: 10, total_debt: 400}
+- fiscal_year: 2029
+  statements: {revenue: 450, op_income: -5, cash_and_st_inv: 10, total_debt: 400}

@@ -1,0 +1,68 @@
+items:
+- vendor: ibkr
+  article_id: 0a000009
+  publisher: IB Market Signals
+  headline: 'TSTA    Price Spike Up   Last:  51.20 +0.40 0.79%'
+  published_at: "2030-03-09T15:00:00Z"
+  retrieved_at: "2030-03-10"
+- vendor: ibkr
+  article_id: 0a000008
+  publisher: Wire Two
+  headline: BRIEF-Testco Raises Quarterly Dividend To XTS 0.55
+  published_at: "2030-03-08T12:05:00Z"
+  retrieved_at: "2030-03-10"
+- vendor: ibkr
+  article_id: 0a000007
+  publisher: Wire One
+  headline: Testco raises quarterly dividend to XTS 0.55
+  published_at: "2030-03-08T12:00:00Z"
+  retrieved_at: "2030-03-10"
+- vendor: eulerpool
+  article_id: ep-00000000007a
+  publisher: Portal
+  headline: 'Testco Raises Quarterly Dividend to XTS 0.55'
+  published_at: "2030-03-08T12:30:00Z"
+  retrieved_at: "2030-03-10"
+  url: https://news.example/testco-dividend
+- vendor: ibkr
+  article_id: 0a000006
+  publisher: Daily Ledger
+  headline: Testco Profit Falls After Input Costs Rise -- Update
+  published_at: "2030-03-07T16:00:00Z"
+  retrieved_at: "2030-03-10"
+- vendor: ibkr
+  article_id: 0a000005
+  publisher: Daily Ledger
+  headline: Testco Profit Falls After Input Costs Rise -- Journal
+  published_at: "2030-03-07T15:00:00Z"
+  retrieved_at: "2030-03-10"
+- vendor: ibkr
+  article_id: 0a000004
+  publisher: Fool Feed
+  headline: 3 Dividend Kings to Buy in March and Never Sell
+  published_at: "2030-03-06T10:00:00Z"
+  retrieved_at: "2030-03-10"
+- vendor: ibkr
+  article_id: 0a000003
+  publisher: Fool Feed
+  headline: Here's How Many Shares of Testco You'd Need for XTS 500 in Yearly Dividends
+  published_at: "2030-03-05T10:00:00Z"
+  retrieved_at: "2030-03-10"
+- vendor: ibkr
+  article_id: 0a000002
+  publisher: Wire One
+  headline: TESTLAND ORDER IMBALANCE <TSTA.T> 12000.0 SHARES ON BUY SIDE
+  published_at: "2030-03-04T09:00:00Z"
+  retrieved_at: "2030-03-10"
+- vendor: ibkr
+  article_id: 0a000001
+  publisher: Screen Vendor
+  headline: Sector Report for Consumer Staples
+  published_at: "2030-02-20T09:00:00Z"
+  retrieved_at: "2030-03-10"
+- vendor: ibkr
+  article_id: 0a000000
+  publisher: Wire One
+  headline: Testco names new chief financial officer
+  published_at: "2030-02-10T09:00:00Z"
+  retrieved_at: "2030-03-10"

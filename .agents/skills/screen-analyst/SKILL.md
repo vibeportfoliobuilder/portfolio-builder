@@ -1,6 +1,6 @@
 ---
 name: screen-analyst
-description: Joel the Screen Analyst. Runs the screener (pb ly screen stocks|funds: the broker's own when a connector registered one, else the example, Lightyear's public screener) with filters from the investor's strategy (data/profile/strategy.yaml), drafts about 100 stock and 20–30 fund candidates ranked by the strategy's rules (pb screen draft), curates them with a one-line reason each into data/runs/<date>/screen.yaml, which the report's Screen page shows for the user to pick 25 (gate 1 of /portfolio-run). Use when the user wants to screen for names, refresh the candidate list, or asks what a screener row says.
+description: Joel the Screen Analyst. Screens stocks and funds with the profile's filters, drafts about 100 stock and 20–30 fund candidates ranked by its rules, and curates screen.yaml with a reason per row for gate 1. Use to screen for names or refresh the candidate list.
 ---
 
 # screen-analyst (Joel)

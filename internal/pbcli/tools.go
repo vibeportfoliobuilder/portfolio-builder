@@ -1,6 +1,7 @@
 package pbcli
 
-// tools.go - the four agent tools: pb search, pb fetch-url, pb news search, pb news read.
+// tools.go - the agent tools: pb search, pb fetch-url, pb news search, pb news read (pb news list
+// is in newslist.go).
 
 import (
 	"errors"
@@ -135,6 +136,7 @@ func newsCmd(e *env) *cobra.Command {
 		Use:   "news",
 		Short: "Company news: Eulerpool for US names, the broker's feed (if a connector supplies one) for non-US names",
 		Long: `news search lists recent headlines for one name and records them in data/stocks/<T>/news.yaml;
+news list prints the saved headlines one line each, with --dedupe folding duplicates and dropping noise;
 news read opens one listed article (broker rows may carry a body; Eulerpool rows are an address to open
 with pb fetch-url). A name is US when its ISIN starts with US (or its country is US). US news needs
 EULERPOOL_API_KEY; non-US news needs a broker connector with a news feed, else the saved headlines
@@ -180,7 +182,7 @@ in news.yaml are shown.`,
 			return err
 		},
 	}
-	c.AddCommand(search, read)
+	c.AddCommand(search, read, newsListCmd(e))
 	return c
 }
 

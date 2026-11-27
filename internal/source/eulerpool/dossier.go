@@ -259,10 +259,49 @@ const (
 	descriptionMax  = 600
 )
 
-// fetchState carries one Fetch: the dossier being built and the first fatal error.
+// fetchState carries one Fetch: the dossier being built, the vendor-wide gaps that apply and the
+// first fatal error.
 type fetchState struct {
-	d     *Dossier
-	fatal error
+	d      *Dossier
+	vendor []VendorGap
+	fatal  error
+}
+
+// VendorGap is a gap true of every Eulerpool dossier: its full text is kept once, in
+// data/<VendorGapsFile>, and each dossier carries one short line naming the ones that apply.
+type VendorGap struct {
+	Short string `yaml:"short"`
+	Text  string `yaml:"text"`
+}
+
+// VendorGapsFile is the file under data/ that holds the vendor-wide gaps' full text.
+const VendorGapsFile = "vendor_gaps.yaml"
+
+// The vendor-wide gaps.
+var (
+	gapAltmanZ = VendorGap{"no Altman Z", "eulerpool: the vendor's Altman Z is always 9999, so none is carried"}
+	gapBalance = VendorGap{"annual balance lines from the quarter-end",
+		"eulerpool: annual balance-sheet totals are mis-mapped by the vendor (assets = goodwill), so balance lines come from the matching quarter-end; earlier years carry cash and debt only"}
+	gapSpecial = VendorGap{"no special-dividend flag",
+		"eulerpool: the dividend ledger has no special-dividend flag and is split-adjusted; a one-off payment counts as regular in the totals, streaks and CAGRs"}
+)
+
+// VendorGaps are the vendor-wide gaps' full text, for data/<VendorGapsFile>.
+func VendorGaps() []VendorGap { return []VendorGap{gapAltmanZ, gapBalance, gapSpecial} }
+
+// vendorGap records a vendor-wide gap; finish turns them into one line.
+func (s *fetchState) vendorGap(g VendorGap) { s.vendor = append(s.vendor, g) }
+
+// finishVendorGaps appends the one line that names the vendor-wide gaps this dossier has.
+func (s *fetchState) finishVendorGaps() {
+	if len(s.vendor) == 0 {
+		return
+	}
+	short := make([]string, len(s.vendor))
+	for i, g := range s.vendor {
+		short[i] = g.Short
+	}
+	s.gap("eulerpool (vendor-wide, full text in data/%s): %s", VendorGapsFile, strings.Join(short, "; "))
 }
 
 // soft records a failed route as a gap; only a refused key or a cancelled run stops Fetch.
@@ -313,7 +352,7 @@ func (c *Client) Fetch(ctx context.Context, id string) (*Dossier, error) {
 		scale = 0.01
 		s.gap("eulerpool: LSE prices are quoted in GBX (pence); price, 52-week range, market cap, monthly closes and price targets were divided by 100 to GBP")
 	}
-	s.gap("eulerpool: the vendor's Altman Z is always 9999, so none is carried")
+	s.vendorGap(gapAltmanZ)
 
 	c.fetchStatements(ctx, s, isin, now)
 	c.fetchPrice(ctx, s, isin, ov, scale, now)
@@ -323,6 +362,7 @@ func (c *Client) Fetch(ctx context.Context, id string) (*Dossier, error) {
 	c.fetchOwnership(ctx, s, isin, prof)
 	c.fetchInsider(ctx, s, isin, prof.Country, now)
 	finishRatios(d)
+	s.finishVendorGaps()
 	if s.fatal != nil {
 		return nil, s.fatal
 	}
@@ -364,7 +404,7 @@ func (c *Client) fetchStatements(ctx context.Context, s *fetchState, isin string
 		d.Years = append(d.Years, per)
 	}
 	if len(d.Years) > 0 {
-		s.gap("eulerpool: annual balance-sheet totals are mis-mapped by the vendor (assets = goodwill), so balance lines come from the matching quarter-end; earlier years carry cash and debt only")
+		s.vendorGap(gapBalance)
 		last := d.Years[len(d.Years)-1]
 		if t, ok := parseDay(last.PeriodEnd); ok && now.Sub(t) > staleAnnualDays*24*time.Hour {
 			s.gap("eulerpool: the latest annual statement is FY%d (period end %s); later fiscal years are missing (known for some small-cap European filersER)", last.FiscalYear, last.PeriodEnd)
@@ -700,7 +740,7 @@ func (c *Client) fetchDividends(ctx context.Context, s *fetchState, isin, ticker
 	slices.SortFunc(h.ByFY, func(a, b FYTotal) int { return a.FiscalYear - b.FiscalYear })
 	streaks(h)
 	s.d.Dividends = h
-	s.gap("eulerpool: the dividend ledger has no special-dividend flag and is split-adjusted; a one-off payment counts as regular in the totals, streaks and CAGRs")
+	s.vendorGap(gapSpecial)
 	if ticker == "" {
 		return
 	}

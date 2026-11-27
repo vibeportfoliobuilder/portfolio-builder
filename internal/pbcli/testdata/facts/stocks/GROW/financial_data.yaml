@@ -1,0 +1,74 @@
+# Made-up company in the shape pb ep fetch writes (years[] oldest first).
+as_of: "2031-03-08"
+source: eulerpool
+ticker: GROW
+currency: XTS
+units: Monetary amounts in millions of XTS; per-share figures in XTS; share counts in millions.
+ttm:
+  period: TTM
+  period_end: "2031-01-31"
+  statements:
+    revenue: 999
+    op_income: 1
+    fcf: 1
+    cash_and_st_inv: 1
+    total_debt: 1
+years:
+- period: "1990"
+  fiscal_year: 1990
+  period_end: "1990-12-31"
+  statements:
+    revenue: 10
+    op_income: 1
+    cash_and_st_inv: 1
+    total_debt: 2
+- period: "2026"
+  fiscal_year: 2026
+  period_end: "2026-12-31"
+  statements:
+    revenue: 1000
+    op_income: 200
+    fcf: 150
+    diluted_shares: 50
+    cash_and_st_inv: 300
+    total_debt: 100
+- period: "2027"
+  fiscal_year: 2027
+  period_end: "2027-12-31"
+  statements:
+    revenue: 1100
+    op_income: 230
+    fcf: 160
+    diluted_shares: 50
+    cash_and_st_inv: 320
+    total_debt: 110
+- period: "2028"
+  fiscal_year: 2028
+  period_end: "2028-12-31"
+  statements:
+    revenue: 1210
+    op_income: 250
+    fcf: 180
+    diluted_shares: 49
+    cash_and_st_inv: 330
+    total_debt: 120
+- period: "2029"
+  fiscal_year: 2029
+  period_end: "2029-12-31"
+  statements:
+    revenue: 1331
+    op_income: 266.2
+    fcf: 266.2
+    diluted_shares: 48
+    cash_and_st_inv: 340
+    total_debt: 130
+dividend_history:
+  currency: XTS
+  ttm_per_share: 1.1
+  by_fy:
+  - fiscal_year: 2028
+    total: 0.9
+    count: 4
+  - fiscal_year: 2029
+    total: 1
+    count: 4

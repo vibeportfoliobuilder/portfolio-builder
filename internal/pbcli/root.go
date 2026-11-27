@@ -12,6 +12,7 @@ import (
 	"io"
 	"os"
 	"path/filepath"
+	"sort"
 	"strings"
 	"time"
 
@@ -77,15 +78,17 @@ Typical run:
 	root.PersistentFlags().StringVar(&e.data, "data", "data", "data folder to read and write")
 	root.PersistentFlags().BoolVar(&e.md, "md", false, "print Markdown instead of JSON where the command supports it")
 	root.AddCommand(lyCmd(e), epCmd(e), edgarCmd(e), deriveCmd(e), portfolioCmd(e), screenCmd(e), watchlistCmd(e), finalCmd(e), getCmd(e), reportCmd(e), runCmd(e),
-		searchCmd(e), fetchURLCmd(e), newsCmd(e), packsCmd(e))
+		searchCmd(e), fetchURLCmd(e), newsCmd(e), packsCmd(e), factsCmd(e), scenarioCmd(e), callTextCmd(e))
 	for _, f := range extraCommands {
 		root.AddCommand(f(e))
 	}
 	return root
 }
 
-// printJSON writes v as two-space JSON with the same keys as its YAML files: v goes
-// through YAML first, since the source packages tag their types for YAML only.
+// printJSON writes v as compact JSON with the same keys as its YAML files: v goes through YAML
+// first, since the source packages tag their types for YAML only. A top-level list prints one
+// element per line and a top-level object one key per line; nothing is indented (it is read by
+// agents, and every indent is tokens).
 func (e *env) printJSON(v any) error {
 	y, err := docfmt.MarshalYAML(v)
 	if err != nil {
@@ -95,12 +98,76 @@ func (e *env) printJSON(v any) error {
 	if err := yaml.Unmarshal(y, &generic); err != nil {
 		return err
 	}
-	b, err := json.MarshalIndent(generic, "", "  ")
+	b, err := compactJSON(generic)
 	if err != nil {
 		return err
 	}
-	_, err = fmt.Fprintf(e.out, "%s\n", b)
+	_, err = e.out.Write(b)
 	return err
+}
+
+// compactJSON is v as JSON without indentation, one top-level element or key per line.
+func compactJSON(v any) ([]byte, error) {
+	var buf bytes.Buffer
+	enc := func(x any) error {
+		var one bytes.Buffer
+		j := json.NewEncoder(&one)
+		j.SetEscapeHTML(false)
+		if err := j.Encode(x); err != nil {
+			return err
+		}
+		buf.Write(bytes.TrimRight(one.Bytes(), "\n"))
+		return nil
+	}
+	switch x := v.(type) {
+	case []any:
+		if len(x) == 0 {
+			buf.WriteString("[]\n")
+			return buf.Bytes(), nil
+		}
+		buf.WriteString("[\n")
+		for i, el := range x {
+			if err := enc(el); err != nil {
+				return nil, err
+			}
+			if i < len(x)-1 {
+				buf.WriteString(",")
+			}
+			buf.WriteString("\n")
+		}
+		buf.WriteString("]\n")
+	case map[string]any:
+		if len(x) == 0 {
+			buf.WriteString("{}\n")
+			return buf.Bytes(), nil
+		}
+		keys := make([]string, 0, len(x))
+		for k := range x {
+			keys = append(keys, k)
+		}
+		sort.Strings(keys)
+		buf.WriteString("{\n")
+		for i, k := range keys {
+			if err := enc(k); err != nil {
+				return nil, err
+			}
+			buf.WriteString(": ")
+			if err := enc(x[k]); err != nil {
+				return nil, err
+			}
+			if i < len(keys)-1 {
+				buf.WriteString(",")
+			}
+			buf.WriteString("\n")
+		}
+		buf.WriteString("}\n")
+	default:
+		if err := enc(x); err != nil {
+			return nil, err
+		}
+		buf.WriteString("\n")
+	}
+	return buf.Bytes(), nil
 }
 
 // path joins parts under the data folder.

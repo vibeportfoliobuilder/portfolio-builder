@@ -105,6 +105,9 @@ Examples:
 				}
 				return r
 			})
+			if err := e.writeVendorGaps(res); err != nil {
+				return err
+			}
 			return e.printJSON(map[string]any{"results": res, "requests": cl.Requests()})
 		},
 	}
@@ -254,4 +257,16 @@ Examples:
 	c.Flags().IntVar(&n, "n", 20, "how many articles")
 	c.Flags().BoolVar(&market, "market", false, "the general market feed instead of one name")
 	return c
+}
+
+// writeVendorGaps keeps the full text of the gaps true of every Eulerpool dossier once, in
+// data/vendor_gaps.yaml, after a fetch that wrote at least one dossier (each names it in one line).
+func (e *env) writeVendorGaps(res []fetchResult) error {
+	for _, r := range res {
+		if r.File != "" && r.Error == "" {
+			_, err := e.writeYAML(map[string]any{"eulerpool": eulerpool.VendorGaps()}, eulerpool.VendorGapsFile)
+			return err
+		}
+	}
+	return nil
 }

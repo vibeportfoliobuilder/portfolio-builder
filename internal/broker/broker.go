@@ -118,17 +118,17 @@ type Weight struct {
 	Pct  float64 `yaml:"pct" json:"pct"`
 }
 
-// NewsItem is one headline the broker lists for an instrument.
+// NewsItem is one headline the broker lists for an instrument. The broker's related-instrument ids
+// are not carried: nothing reads them, and they cost 0.6–1.7 KB a name.
 type NewsItem struct {
-	ID            string   `yaml:"id" json:"id"`
-	Title         string   `yaml:"title" json:"title"`
-	Type          string   `yaml:"type" json:"type"`
-	Source        string   `yaml:"source,omitempty" json:"source,omitempty"`
-	Origin        string   `yaml:"origin,omitempty" json:"origin,omitempty"`
-	URL           string   `yaml:"url,omitempty" json:"url,omitempty"`
-	Published     string   `yaml:"published" json:"published"`
-	Sentiment     string   `yaml:"sentiment,omitempty" json:"sentiment,omitempty"`
-	InstrumentIDs []string `yaml:"instrument_ids,omitempty" json:"instrument_ids,omitempty"`
+	ID        string `yaml:"id" json:"id"`
+	Title     string `yaml:"title" json:"title"`
+	Type      string `yaml:"type" json:"type"`
+	Source    string `yaml:"source,omitempty" json:"source,omitempty"`
+	Origin    string `yaml:"origin,omitempty" json:"origin,omitempty"`
+	URL       string `yaml:"url,omitempty" json:"url,omitempty"`
+	Published string `yaml:"published" json:"published"`
+	Sentiment string `yaml:"sentiment,omitempty" json:"sentiment,omitempty"`
 }
 
 // EarningsCall is the latest earnings call the broker links.

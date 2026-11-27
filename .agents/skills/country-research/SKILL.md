@@ -1,6 +1,6 @@
 ---
 name: country-research
-description: Writes the investor's country pack, data/packs/country/<name>.yaml - home currency, long-run inflation, the dividend withholding each source country applies to a resident, REIT and fund-domicile rates, a home-market transaction tax, the tax-advantaged account, the government bonds the switch to income buys - from cited, dated public sources, and activates it in data/config.yaml. Use at setup (AGENTS.md), when the investor moves country, or when a rate in the pack is questioned or out of date.
+description: Writes the country pack for the investor's residence (home currency, withholding, dividend tax, transaction taxes, bonds), every figure cited and dated. Use at first setup, on a move, or when a tax rule changes.
 ---
 
 # country-research

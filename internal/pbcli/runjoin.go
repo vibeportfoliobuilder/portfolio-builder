@@ -256,6 +256,232 @@ Example:
 	}
 	join.Flags().StringVar(&run, "run", "", "run date (default: the newest data/runs/<date>)")
 	join.Flags().BoolVar(&force, "force", false, "rewrite a <base>.md that already exists")
-	c.AddCommand(join)
+	c.AddCommand(join, sectionCmd(e))
 	return c
+}
+
+func sectionCmd(e *env) *cobra.Command {
+	var summary bool
+	var headings []string
+	c := &cobra.Command{
+		Use:   "section <file.md under data/> [T ...] [--summary] [--heading <prefix> ...]",
+		Short: "Print only some sections of a Markdown file under data/ (a ticker's, the Summary, numbered headings)",
+		Long: `Prints sections of a Markdown file under data/ as they are, so an agent reads only what it needs:
+  <T> ...            the "## <T> — …" section of each ticker (an unknown ticker lists the ones found)
+  --summary          the "## Summary" section
+  --heading <prefix> each "##" or "###" heading whose text starts with the prefix, with its block up
+                     to the next heading of the same or a higher level; a number matches up to a
+                     space or a dot, so 6.1 matches "### 6.1 Groups" but not "### 6.10 Exclusions"
+With no selector it prints the file's "##"/"###" headings (a table of contents). A bare file name
+(moat_review.md) is read from the newest run folder when data/ has no such file. Read-only.
+Examples:
+  pb run section runs/<date>/moat_review.md --summary KO O
+  pb run section verdicts.md MSFT
+  pb run section profile/investor_profile.md --heading 1. --heading 6.1 --heading 9.
+  pb run section profile/investor_profile.md`,
+		Args: cobra.MinimumNArgs(1),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			b, name, err := e.readMarkdownUnder(args[0])
+			if err != nil {
+				return err
+			}
+			out, err := pickSections(string(b), name, args[1:], summary, headings)
+			if err != nil {
+				return err
+			}
+			_, err = fmt.Fprint(e.out, out)
+			return err
+		},
+	}
+	c.Flags().BoolVar(&summary, "summary", false, "print the ## Summary section")
+	c.Flags().StringArrayVar(&headings, "heading", nil, "print each ##, ### or #### heading starting with this prefix, with its block (repeatable)")
+	return c
+}
+
+// readMarkdownUnder reads a .md file by its path under data/ (never outside it, never data/secrets);
+// a bare file name missing from data/ is looked up in the newest run folder.
+func (e *env) readMarkdownUnder(rel string) ([]byte, string, error) {
+	clean := filepath.Clean(rel)
+	if filepath.IsAbs(clean) || clean == ".." || strings.HasPrefix(clean, ".."+string(filepath.Separator)) {
+		return nil, "", fmt.Errorf("%s: give a path under the data folder", rel)
+	}
+	if strings.Split(filepath.ToSlash(clean), "/")[0] == "secrets" {
+		return nil, "", fmt.Errorf("%s: data/secrets is never read", rel)
+	}
+	if !strings.HasSuffix(strings.ToLower(clean), ".md") {
+		return nil, "", fmt.Errorf("%s: pb run section reads Markdown (.md) files", rel)
+	}
+	b, err := os.ReadFile(e.path(clean))
+	if err == nil {
+		return b, clean, nil
+	}
+	if !os.IsNotExist(err) {
+		return nil, "", err
+	}
+	if !strings.ContainsAny(rel, `/\`) {
+		alt := filepath.Join("runs", e.latestRun(), clean)
+		if b, err := os.ReadFile(e.path(alt)); err == nil {
+			return b, alt, nil
+		}
+		return nil, "", fmt.Errorf("%s: no such file under %s (nor %s)", rel, e.data, alt)
+	}
+	return nil, "", fmt.Errorf("%s: no such file under %s", rel, e.data)
+}
+
+// mdHeading is one "##" or "###" heading of a file: its level, text and line.
+type mdHeading struct {
+	Level int
+	Text  string
+	Line  int
+}
+
+// mdHeadings finds the "##"/"###" (and, for block ends, "#" and deeper) headings outside code fences.
+func mdHeadings(lines []string) []mdHeading {
+	var out []mdHeading
+	fence := false
+	for i, l := range lines {
+		t := strings.TrimRight(l, "\r")
+		if strings.HasPrefix(strings.TrimSpace(t), "```") {
+			fence = !fence
+			continue
+		}
+		if fence || !strings.HasPrefix(t, "#") {
+			continue
+		}
+		n := len(t) - len(strings.TrimLeft(t, "#"))
+		if n > 6 || len(t) == n || t[n] != ' ' {
+			continue
+		}
+		out = append(out, mdHeading{n, strings.TrimSpace(t[n:]), i})
+	}
+	return out
+}
+
+// headingMatches says whether a heading's text starts with the prefix; a prefix ending in a digit
+// must end at a space, a dot or the end of the text there (6.1 is not 6.10).
+func headingMatches(text, prefix string) bool {
+	if prefix == "" || len(text) < len(prefix) || !strings.EqualFold(text[:len(prefix)], prefix) {
+		return false
+	}
+	last := prefix[len(prefix)-1]
+	if last < '0' || last > '9' || len(text) == len(prefix) {
+		return true
+	}
+	next := text[len(prefix)]
+	return next == ' ' || next == '.' || next == ')' || next == ':'
+}
+
+// isJoinedHead says whether a heading is one pb run join demoted from a batch file: "<text> (<part>.md)".
+func isJoinedHead(text, want string) bool {
+	i := strings.LastIndex(text, " (")
+	return i > 0 && strings.HasSuffix(text, ".md)") && strings.EqualFold(text[:i], want)
+}
+
+// pickSections prints the blocks asked for, in file order for headings and in the order asked for
+// tickers; with no selector, the headings themselves.
+func pickSections(md, name string, tickers []string, summary bool, prefixes []string) (string, error) {
+	lines := strings.Split(md, "\n")
+	hs := mdHeadings(lines)
+	block := func(k int) (int, int) {
+		end := len(lines)
+		for _, h := range hs[k+1:] {
+			if h.Level <= hs[k].Level {
+				end = h.Line
+				break
+			}
+		}
+		return hs[k].Line, end
+	}
+	if len(tickers) == 0 && !summary && len(prefixes) == 0 {
+		var b strings.Builder
+		fmt.Fprintf(&b, "%s: headings (line: heading)\n", name)
+		for _, h := range hs {
+			if h.Level == 2 || h.Level == 3 {
+				fmt.Fprintf(&b, "%d: %s %s\n", h.Line+1, strings.Repeat("#", h.Level), h.Text)
+			}
+		}
+		return b.String(), nil
+	}
+	var picked [][2]int
+	add := func(k int) {
+		lo, hi := block(k)
+		for _, p := range picked {
+			if lo >= p[0] && hi <= p[1] {
+				return // already inside a block printed
+			}
+		}
+		picked = append(picked, [2]int{lo, hi})
+	}
+	if summary {
+		found := false
+		for k, h := range hs {
+			// A joined file (pb run join) keeps each batch's summary as "#### Summary (<part>.md)".
+			if h.Level == 2 && strings.EqualFold(h.Text, "Summary") || h.Level == 4 && isJoinedHead(h.Text, "Summary") {
+				add(k)
+				found = true
+			}
+		}
+		if !found {
+			return "", fmt.Errorf("%s: no \"## Summary\" section", name)
+		}
+	}
+	if len(prefixes) > 0 {
+		var sel []int
+		for k, h := range hs {
+			if h.Level < 2 || h.Level > 4 {
+				continue
+			}
+			for _, p := range prefixes {
+				if headingMatches(h.Text, strings.TrimSpace(p)) {
+					sel = append(sel, k)
+					break
+				}
+			}
+		}
+		if len(sel) == 0 {
+			return "", fmt.Errorf("%s: no ##, ### or #### heading starts with %s", name, strings.Join(prefixes, ", "))
+		}
+		// Wider blocks first, so a sub-heading inside a picked section is not printed twice.
+		sort.SliceStable(sel, func(i, j int) bool { return hs[sel[i]].Level < hs[sel[j]].Level })
+		for _, k := range sel {
+			add(k)
+		}
+		sort.SliceStable(picked, func(i, j int) bool { return picked[i][0] < picked[j][0] })
+	}
+	if len(tickers) > 0 {
+		at := map[string]int{}
+		var found []string
+		for k, h := range hs {
+			if h.Level != 2 || strings.EqualFold(h.Text, "Summary") {
+				continue
+			}
+			t := headTicker(h.Text)
+			if _, dup := at[t]; !dup {
+				at[t] = k
+				if isTickerHead(h.Text, nil) {
+					found = append(found, t)
+				}
+			}
+		}
+		var miss []string
+		for _, t := range tickers {
+			if _, ok := at[strings.ToUpper(strings.TrimSpace(t))]; !ok {
+				miss = append(miss, t)
+			}
+		}
+		if len(miss) > 0 {
+			return "", fmt.Errorf("%s: no section for %s (sections found: %s)", name, strings.Join(miss, ", "), strings.Join(found, ", "))
+		}
+		for _, t := range tickers {
+			add(at[strings.ToUpper(strings.TrimSpace(t))])
+		}
+	}
+	var b strings.Builder
+	for _, p := range picked {
+		blk := strings.TrimRight(strings.Join(lines[p[0]:p[1]], "\n"), "\n ")
+		blk = strings.TrimRight(strings.TrimSuffix(blk, "---"), "\n ") // the rule between sections
+		b.WriteString(blk)
+		b.WriteString("\n\n")
+	}
+	return strings.TrimRight(b.String(), "\n") + "\n", nil
 }

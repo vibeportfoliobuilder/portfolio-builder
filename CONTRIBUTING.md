@@ -67,7 +67,7 @@ runs only while that pack is active, and several connectors can live side by sid
   `internal/report` is rendering only; `internal/source/*` → `internal/{httpx,cache,store,docfmt,core}`.
   Sources never import each other or the CLI.
 - Every output file is written with `docfmt.MarshalYAML` (two-space YAML) through
-  `store.WriteFileAtomic`; JSON on stdout uses a two-space indent.
+  `store.WriteFileAtomic`; JSON stored on disk uses a two-space indent; JSON on stdout is compact (a top-level list one element per line, an object one key per line), to keep agent reads small.
 - `data/` holds normalized YAML only, latest version overwritten in place. Raw responses go to the
   cache under `os.UserCacheDir()/pb`, never into the repository.
 - Missing data is absent (`nil`, `needs_look`), never a zero. Comments: one or two lines saying why.

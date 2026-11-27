@@ -1,6 +1,6 @@
 ---
 name: dossier-audit
-description: Audits agent output in data/runs/<date>/*.md against house rule 1 - every figure must trace to a data/ file, an upstream agent file the agent was entitled to read, or a ./pb output that left a ledger row. Use after a /portfolio-run (before gate 3 or publishing), after any single agent or skill wrote a run file, or when asked whether an analysis invented a number.
+description: "Audits run files in data/runs/<date>/ against house rule 1: every figure traces to a data/ file, an upstream agent file or a ./pb output. Use after an agent or skill writes a run file, before a gate, or when asked whether a number was invented."
 ---
 
 # dossier-audit
@@ -9,7 +9,7 @@ House rule 1 of every agent and skill is the load-bearing rule of the whole run,
 
 > **Never fabricate a number.** Every figure must trace to a file under `data/`, to an upstream file in this run's folder, or to a `./pb …` command you actually ran. If you don't have it, write `DATA UNAVAILABLE` and proceed.
 
-A tool that reaches outside writes down what it found before the agent sees it (`./pb search` and `./pb fetch-url` append to `data/stocks/<T>/sources.yaml` or `data/research/sources.yaml`; `./pb news search` writes `news.yaml`), so "a command you actually ran" leaves a row. A figure whose only provenance is a tool call must resolve to a ledger row; one that resolves to nothing is a finding. `./pb news read` stores nothing: a figure from it is **tool-only**.
+A tool that reaches outside writes down what it found before the agent sees it (`./pb search` and `./pb fetch-url` append to `data/stocks/<T>/sources.yaml` or `data/research/sources.yaml`; `./pb news search` writes `news.yaml`), so "a command you actually ran" leaves a row. `./pb facts` and `./pb get` print each figure with its data/ source field: trace the figure to that field. A `./pb scenario` figure traces to `data/runs/<date>/scenario_inputs.yaml` (the assumptions) plus the start values' source fields the command prints: rerun `./pb scenario --file data/runs/<date>/scenario_inputs.yaml --md` and compare. A figure cited to `earnings_call.pdf p.N` traces to that page of `earnings_call.txt` (or the PDF). A figure whose only provenance is a tool call must resolve to a ledger row; one that resolves to nothing is a finding. `./pb news read` stores nothing: a figure from it is **tool-only**.
 
 Run from the repo root. `RUN=data/runs/<date>`.
 

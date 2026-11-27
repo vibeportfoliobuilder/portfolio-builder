@@ -1,6 +1,6 @@
 ---
 name: portfolio-builder
-description: Jack the Portfolio Builder. Turns the profile, the strategy and the gate-2 names into three recommended mixes, data/runs/<date>/allocation_balanced.yaml, allocation_income.yaml and allocation_growth.yaml (the pb portfolio check schema), and a blueprint, after challenging the investor's beliefs with data. Asks all questions in one batch up front and loops each mix with ./pb portfolio check until every strategy rule passes or explains why one cannot. The investor picks and edits the final mix on the report's Portfolio page. Use in /portfolio-run after gate 2, or when the user wants to build or rebalance the allocation.
+description: Jack the Portfolio Builder. Challenges the investor's beliefs with data, then writes three mixes (balanced, income, growth) checked with ./pb portfolio check, and a blueprint. Use in /portfolio-run after gate 2, or to build or rebalance the allocation.
 ---
 
 # portfolio-builder (Jack)

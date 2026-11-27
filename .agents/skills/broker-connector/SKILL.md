@@ -1,6 +1,6 @@
 ---
 name: broker-connector
-description: Writes the investor's broker pack, data/packs/broker/<name>.yaml - the fee per market, the FX cost, where the broker's withholding differs from the country pack, the default markets - from the broker's published price list, cited and dated, and activates it. Optionally builds a read-only connector (holdings, the broker's fund yields and news) in the investor's own copy, from the public example screener. Use at setup (AGENTS.md), when the broker changes its prices, or when the investor switches broker.
+description: Writes the investor's broker pack (fees, FX cost) from the broker's published price list and, if wanted, a read-only connector for holdings, fund yields and news. Use at first setup or when the broker changes.
 ---
 
 # broker-connector

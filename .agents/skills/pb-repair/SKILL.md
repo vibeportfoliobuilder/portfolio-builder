@@ -1,6 +1,6 @@
 ---
 name: pb-repair
-description: Repairs the pb data binary when a ./pb command fails or returns data that no longer looks right. Runs make test and make test-live, separates an outage or a login problem from a vendor changing a payload shape, locates the failing decoder and its fixture, and fixes the CODE until the unchanged tests pass. Refreshing a fixture needs the user's approval. Use when any ./pb command errors, a field that used to be filled comes back empty, make test or make test-live goes red, or a vendor is suspected of changing a response.
+description: "Repairs the pb data tool when a ./pb command fails or returns data that no longer looks right: tells an outage or login problem from a vendor changing a payload, and fixes the code until the unchanged tests pass. Use when a command errors or make test goes red."
 ---
 
 # pb-repair

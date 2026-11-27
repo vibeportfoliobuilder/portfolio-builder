@@ -1,6 +1,6 @@
 ---
 name: profile
-description: Rebuilds or updates data/profile/investor_profile.md, the investor profile every agent reads first, from the user's own statements. Keeps it a standalone document with no citations, shows the user a diff, and writes it only after their approval. Use when the user states a new goal, rule, preference, cap, belief or circumstance, when /portfolio-builder marked answers REVISED, or when the user asks to review or rebuild the profile.
+description: Writes or updates data/profile/investor_profile.md and strategy.yaml from the investor's own statements, with a diff they approve; also runs the first-session setup. Use when the investor states a new goal, rule or circumstance, or asks to review the profile.
 ---
 
 # profile
@@ -15,6 +15,19 @@ description: Rebuilds or updates data/profile/investor_profile.md, the investor 
 - **Contradictions:** when a new statement conflicts with the file, the newest statement wins, but ask the user to confirm it in the same batch as the diff; never resolve a conflict silently. An item the user leaves open goes to §10 as open: never with a default number.
 - **Secrets:** never write account ids, balances, tokens, passwords or personal identifiers (email, phone, ID numbers) into the profile.
 - Every number the code judges by lives in `data/profile/strategy.yaml` (below), written with the profile from the same statements; the country-specific facts (bond yields, inflation, withholding, transaction taxes) live in the country pack and the broker's prices in the broker pack (`./pb packs`). Changing a strategy number is an edit of that file (this skill), never a code change.
+
+## First session: setup
+No `data/profile/investor_profile.md` yet means a first session. In order:
+1. Ask the language, and write `data/config.yaml`: `country`, `broker`, `language`.
+2. The questionnaire below, one topic per batch, then the first profile and the strategy file
+   (`data/profile/strategy.yaml`: every limit the code judges by, including the money: `start_amount`,
+   `monthly`, `target_monthly`, `higher_monthly`; nothing has a default, so an unset limit skips its
+   rule). `./pb packs` lists the keys still unset (`strategy_unset`).
+3. **Country pack:** /country-research writes `data/packs/country/<name>.yaml` for the investor's
+   country of residence, every figure cited and dated.
+4. **Broker:** /broker-connector writes `data/packs/broker/<name>.yaml` from the broker's published
+   price list, and, only if the investor wants one, a read-only connector (holdings, the broker's
+   fund yields, news). A first run needs neither holdings nor a connector.
 
 ## A first profile: the questionnaire
 With no profile yet, ask the questionnaire (the Q1–Q38 list in /portfolio-builder, step a), in the language `./pb packs` names, one topic per batch: situation, goals, risk, structure, the future, sectors, process. Save the user's answers verbatim to `data/profile/raw/user_answers.md`, then write the first profile from them with the steps below (step 1 has no old file to read; show the whole file instead of a diff).
